@@ -28,17 +28,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.codelab.friendlychat.R;
 import com.google.firebase.codelab.friendlychat.fragment.FragmentChat;
+import com.google.firebase.codelab.friendlychat.fragment.FragmentRecentPosts;
+import com.google.firebase.codelab.friendlychat.fragment.FragmentTopPosts;
+import com.google.firebase.codelab.friendlychat.fragment.FragmentUserPosts;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
@@ -83,7 +89,10 @@ public class MainActivity extends AppCompatActivity
 
         fragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             private final Fragment[] fragments = new Fragment[]{
-                    new FragmentChat()
+                    new FragmentChat(),
+                    new FragmentRecentPosts(),
+                    new FragmentUserPosts(),
+                    new FragmentTopPosts()
             };
             private final String[] fragmentNames = new String[]{
                     "Chat",
@@ -114,13 +123,11 @@ public class MainActivity extends AppCompatActivity
         fetchRemoteConfig();
 
 
-
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-//                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .addApi(AppInvite.API)
                 .build();
-
 
 
         // Initialize ProgressBar and RecyclerView.
@@ -130,6 +137,12 @@ public class MainActivity extends AppCompatActivity
         mViewPager.setAdapter(fragmentPagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
 
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, NewPostActivity.class));
+            }
+        });
 
     }
 
@@ -217,11 +230,11 @@ public class MainActivity extends AppCompatActivity
                 fetchRemoteConfig();
                 return true;
             case R.id.sign_out_menu:
-//                mFirebaseAuth.signOut();
-//                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+                FirebaseAuth.getInstance().signOut();
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
 //                mUsername = ANONYMOUS;
-//                startActivity(new Intent(this, SignInActivity.class));
-//                finish();
+                startActivity(new Intent(this, SignInActivity.class));
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
