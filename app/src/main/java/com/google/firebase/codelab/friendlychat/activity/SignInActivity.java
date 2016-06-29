@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.firebase.codelab.friendlychat;
+package com.google.firebase.codelab.friendlychat.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,20 +35,24 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.codelab.friendlychat.R;
+import com.google.firebase.codelab.friendlychat.model.User;
+import com.google.firebase.codelab.friendlychat.utility.Utility;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-public class SignInActivity extends AppCompatActivity implements
+public class SignInActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
-
     private SignInButton mSignInButton;
-
     private GoogleApiClient mGoogleApiClient;
-
     // Firebase instance variables
     FirebaseAuth mFirebaseAuth;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +61,8 @@ public class SignInActivity extends AppCompatActivity implements
 
         // Assign fields
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
-
-
         // Set click listeners
         mSignInButton.setOnClickListener(this);
-
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -75,6 +76,7 @@ public class SignInActivity extends AppCompatActivity implements
         // Initialize FirebaseAuth
 
         mFirebaseAuth = FirebaseAuth.getInstance();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -116,8 +118,24 @@ public class SignInActivity extends AppCompatActivity implements
 
     }
 
+    private void writeNewUser(String userId, String name, String email) {
+        User user = new User(name, email);
+        mDatabaseReference.child("user").child(userId).setValue(user);
+
+    }
+
+    private void onAuthSuccess(FirebaseUser firebaseUser) {
+        String userName = Utility.getUserNameFromEmail(firebaseUser.getEmail());
+        writeNewUser(firebaseUser.getUid(), userName, firebaseUser.getEmail());
+
+        startActivity(new Intent(SignInActivity.this, MainActivity.class));
+        finish();
+    }
+
     private void firebaseAuthWithGoogle(GoogleSignInAccount signInAccount) {
-        Log.d(TAG, "Google Account Id :" + signInAccount.getId());
+        Log.d(TAG, "Google Account Id :" + signInAccount.getId() + "\n" + signInAccount.getEmail() + "\n:" + Utility.getUserNameFromEmail(signInAccount.getEmail()));
+        Log.i(TAG, "Display Name :" + signInAccount.getDisplayName());
+
         AuthCredential credential = GoogleAuthProvider.getCredential(signInAccount.getIdToken(), null);
         mFirebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -126,8 +144,7 @@ public class SignInActivity extends AppCompatActivity implements
                     Log.w(TAG, "SignInWithCredential :" + task.getException());
                     Toast.makeText(SignInActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                 } else {
-                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
-                    finish();
+                    onAuthSuccess(task.getResult().getUser());
                 }
             }
         });
