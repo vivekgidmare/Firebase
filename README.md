@@ -17,17 +17,18 @@ Make rest api post request as follows
 
 API end : https://fcm.googleapis.com/fcm/send
 
-Req. Header : Authorization : key=value_of_project_server_key 
-              Content-Type  : application/json
+Req. Header : 
+                  Authorization : key=value_of_project_server_key 
+                  Content-Type  : application/json
 Req. Body   :
 
-{ 
-"data": {
-    "title": "5x3",
-    "details": "15:10"
-  },
-  "to":"token_of_user_got_from_firebase"
-}
+    { 
+    "data": {
+        "title": "5x3",
+        "details": "15:10"
+      },
+      "to":"token_of_user_got_from_firebase"
+    }
 
 This data will get delivered to Class extending "FirebaseMessagingService" in onMessageReceived method
 and data can be retrived using remoteMessage.getData()
