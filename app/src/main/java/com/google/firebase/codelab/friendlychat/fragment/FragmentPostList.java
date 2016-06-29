@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.codelab.friendlychat.R;
+import com.google.firebase.codelab.friendlychat.activity.PostDetailActivity;
 import com.google.firebase.codelab.friendlychat.model.Post;
 import com.google.firebase.codelab.friendlychat.viewholder.PostViewHolder;
 import com.google.firebase.database.DataSnapshot;
@@ -73,9 +74,9 @@ public abstract class FragmentPostList extends Fragment {
                     @Override
                     public void onClick(View v) {
                         // Launch PostDetailActivity
-//                        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-//                        intent.putExtra(PostDetailActivity.EXTRA_POST_KEY, postKey);
-//                        startActivity(intent);
+                        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
+                        intent.putExtra(PostDetailActivity.EXTRA_POST_KEY, postKey);
+                        startActivity(intent);
                     }
                 });
 
@@ -103,6 +104,8 @@ public abstract class FragmentPostList extends Fragment {
 
             }
         };
+
+        recyclerView.setAdapter(mAdapter);
 
 
     }

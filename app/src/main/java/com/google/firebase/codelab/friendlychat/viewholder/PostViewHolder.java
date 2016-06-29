@@ -1,6 +1,7 @@
 package com.google.firebase.codelab.friendlychat.viewholder;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,7 +27,9 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         numStarsView = (TextView) itemView.findViewById(R.id.post_num_stars);
         bodyView = (TextView) itemView.findViewById(R.id.post_body);
     }
+
     public void bindToPost(Post post, View.OnClickListener starClickListener) {
+        Log.i("TAG", "title:" + post.title + "\n:" + post.body);
         titleView.setText(post.title);
         authorView.setText(post.author);
         numStarsView.setText(String.valueOf(post.starCount));

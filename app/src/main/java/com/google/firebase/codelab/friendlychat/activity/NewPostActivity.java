@@ -68,13 +68,15 @@ public class NewPostActivity extends BaseActivity {
 
         // [START single_value_read]
         final String userId = getUid();
-        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
+        Log.d(TAG,"userId :"+userId);
+        mDatabase.child("user").child(userId).addListenerForSingleValueEvent(
                 new ValueEventListener() {
+
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // Get user value
                         User user = dataSnapshot.getValue(User.class);
-
+                        Log.e(TAG,"user :"+user);
                         // [START_EXCLUDE]
                         if (user == null) {
                             // User is null, error out
@@ -96,6 +98,7 @@ public class NewPostActivity extends BaseActivity {
                     public void onCancelled(DatabaseError databaseError) {
                         Log.w(TAG, "getUser:onCancelled", databaseError.toException());
                     }
+
                 });
         // [END single_value_read]
     }
