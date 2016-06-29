@@ -18,9 +18,11 @@ Make rest api post request as follows
 API end : https://fcm.googleapis.com/fcm/send
 
 Req. Header : 
-                  Authorization : key=value_of_project_server_key 
-                  Content-Type  : application/json
-Req. Body   :
+    
+    Authorization : key=value_of_project_server_key 
+    Content-Type  : application/json
+
+ Req. Body   :
 
     { 
     "data": {
